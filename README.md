@@ -76,8 +76,6 @@ This creates:
 * `data/geonames.sqlite3`
 
 
----
-
 ## Example: Retrieve full tree of Germany
 
 ```sql
