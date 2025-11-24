@@ -11,8 +11,6 @@ This tool converts Geonames data (`allCountries.zip` and `alternateNamesV2.zip`)
 - Supports recursive tree queries (SQLite `WITH RECURSIVE`)
 - Suitable for geographic apps, routing systems, map backends, knowledge graphs, entity linking and place normalization
 
----
-
 ## Database Schema
 
 ### `places`
@@ -39,7 +37,6 @@ This tool converts Geonames data (`allCountries.zip` and `alternateNamesV2.zip`)
 | lang      | TEXT    | Language or ISO code |
 | name      | TEXT    | Alternative name     |
 
----
 
 ## How It Builds the Hierarchy
 
@@ -61,22 +58,23 @@ Processing:
 Result:  
 Germany → Nordrhein-Westfalen → Kreis → municipality → town
 
----
-
 ## Usage
 
 Place files in:
 
-data/allCountries.zip
-data/alternateNamesV2.zip
+* `data/allCountries.zip`
+* `data/alternateNamesV2.zip`
 
 Run import:
 
+```bash
 python3 convert.py
+```
 
 This creates:
 
-geonames.db
+* `data/geonames.sqlite3`
+
 
 ---
 
@@ -91,12 +89,11 @@ WITH RECURSIVE r(geonameid, parent_id, name, level) AS (
     JOIN r ON p.parent_id = r.geonameid
 )
 SELECT * FROM r ORDER BY level, name;
-
-
-⸻
+```
 
 Example: Retrieve cities under a specific ADM3
 
+```sql
 WITH RECURSIVE r(id) AS (
     SELECT geonameid FROM places WHERE geonameid=XXXXXX
     UNION ALL
@@ -104,36 +101,30 @@ WITH RECURSIVE r(id) AS (
 )
 SELECT * FROM places
 WHERE geonameid IN r AND feature_code LIKE 'PPL%';
+```
 
+## Performance Notes
 
-⸻
+  * Initial import is large (10–20M rows)
+  * SQLite handles it, but consider migrating later to:
+  * Postgres
+  * DuckDB
+  * ClickHouse
 
-Performance Notes
-	•	Initial import is large (10–20M rows)
-	•	SQLite handles it, but consider migrating later to:
-	•	Postgres
-	•	DuckDB
-	•	ClickHouse
+## Future improvements
 
-⸻
+  * Population data integration
+  * Time zones
+  * Elevation
+  * OSM polygon cross-linking
+  * Entity deduplication and normalization
 
-Future improvements
-	•	Population data integration
-	•	Time zones
-	•	Elevation
-	•	OSM polygon cross-linking
-	•	Entity deduplication and normalization
-
-⸻
-
-License
+## License
 
 Use freely. Data provided under Geonames open license:
 http://www.geonames.org/export/
 
-⸻
-
-Attribution
+## Attribution
 
 This import tool is optimized for real-world geospatial systems and knowledge-graph applications. If you use it, consider attribution, but it’s optional. Contributions welcome.
 

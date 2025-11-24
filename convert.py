@@ -32,7 +32,9 @@ def create_tables(conn):
         CREATE TABLE IF NOT EXISTS names(
             geonameid INTEGER,
             lang TEXT,
-            name TEXT
+            name TEXT,
+            isPreferred INTEGER,
+            isShort INTEGER
         );
     """
     )
@@ -114,9 +116,17 @@ def load_alternatenames(conn):
                 lang = parts[2] if parts[2] != "" else None
                 name = parts[3] if parts[3] != "" else None
 
+                isColloquial = parts[4] if len(parts) > 4 else "0"
+                isHistoric = parts[5] if len(parts) > 5 else "0"
+                isPreferred = parts[6] if len(parts) > 6 and parts[6] != "" else "0"
+                isShort = parts[7] if len(parts) > 7 and parts[7] != "" else "0"
+
+                if isColloquial == "1" or isHistoric == "1":
+                    continue
+
                 conn.execute(
-                    "INSERT INTO names VALUES (?, ?, ?)",
-                    (geonameid, lang, name),
+                    "INSERT INTO names VALUES (?, ?, ?, ?, ?)",
+                    (geonameid, lang, name, int(isPreferred), int(isShort)),
                 )
     conn.commit()
 
